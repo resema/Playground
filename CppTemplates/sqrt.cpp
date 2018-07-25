@@ -30,7 +30,7 @@ constexpr T sqrt(T x)
 
 int main()
 {
-    static_assert(sqrt(25) == 4, "not correct");
+    static_assert(sqrt(25) == 5, "not correct");
 
     return 0;
 }
