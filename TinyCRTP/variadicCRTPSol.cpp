@@ -48,17 +48,17 @@ constexpr bool HasFeatureOld()
     if constexpr(std::is_same<ToCheck<Derived>, Current<Derived>>::value)
         return true;
     else if constexpr(sizeof...(Features) == 0)
-        return false
+        return false;
     else
-        return HasFeature<Derived, ToCheck, Features...>();
+        return HasFeatureOld<Derived, ToCheck, Features...>();
 }
 
 template<typename Derived,
          template<typename> typename ToCheck,
          template<typename> typename... Features>
-         constexpr bool HasFeature()
+constexpr bool HasFeature()
 {
-    return (std::is_same<ToCheck<Derived>, Features<Derived>>:value || ...);
+    return (std::is_same<ToCheck<Derived>, Features<Derived>>::value || ...);
 }
 
 template<typename Derived, template<typename> typename... Features>
