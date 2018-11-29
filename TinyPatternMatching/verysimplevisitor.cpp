@@ -1,3 +1,4 @@
+#include <variant>
 #include <iostream>
 
 struct SWidget1 {};
