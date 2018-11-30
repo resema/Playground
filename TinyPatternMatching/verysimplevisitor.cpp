@@ -1,8 +1,12 @@
 #include <variant>
 #include <iostream>
 
-struct SWidget1 {};
-struct SWidget2 {};
+struct SWidget1 
+{
+};
+struct SWidget2 
+{
+};
 
 struct SVisitor
 {
@@ -22,13 +26,12 @@ struct SVisitor
     {
         rOStream << "It's an Twoer!" << std::endl;
     } 
-}
+};
 
 int main()
 {
     using SumType = std::variant<SWidget1, SWidget2>;
 
-    SumTyp vWidget.emplace<0>(SWidget1);
-
-    std::visit(Visitor{std::cout}, vWidget);
+    SumType vWidget = SWidget1();
+    std::visit(SVisitor{std::cout}, vWidget);
 }
