@@ -16,11 +16,11 @@ int main()
 {
     std::variant<std::string, int> var;
     var = 1;
-    
+
     std::visit(
         overload2(
-            [](int) { std::cout << "int!\n"; },
-            [](const std::string&) { std::cout << "string!\n"; }
+            [](int){ std::cout << "int!\n"; },
+            [](const std::string&){ std::cout << "string!\n"; }
         ),
         var
     );
