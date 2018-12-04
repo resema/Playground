@@ -56,8 +56,22 @@ struct DoorState
     {
         State operator()(const DoorOpened&) { return DoorOpened(); }
         State operator()(const DoorClosed&) { return DoorClosed(); }
-        State operator())const DoorLocked&) { return DoorClosed(); }
+        State operator()(const DoorLocked&) { return DoorClosed(); }
     };
 
     State m_state;
+};
+
+int main()
+{
+    DoorState s;
+    assert(std::holds_alternative<DoorState::DoorOpened>(s.m_state));
+    s.lock();
+    assert(std::holds_alternative<DoorState::DoorOpened>(s.m_state));
+    s.close();
+    assert(std::holds_alternative<DoorState::DoorClosed>(s.m_state));
+    s.lock();
+    assert(std::holds_alternative<DoorState::DoorLocked>(s.m_state));
+    s.open();
+    assert(std::holds_alternative<DoorState::DoorLocked>(s.m_state));
 }
