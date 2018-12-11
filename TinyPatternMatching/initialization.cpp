@@ -18,7 +18,11 @@ int main()
         // std::variant<NotSimpleConstructible, int> cannotInit; // compile-time error
         std::variant<std::monostate, NotSimpleConstructible, int> okInit;
         std::cout << okInit.index() << std::endl;
-    }
+        if (auto obj = std::get_if<std::monostate>(&okInit); obj)    // Visitor
+        {
+            std::cout << "containg type is std::monostate" << std::endl;
+        }
+    }  
     {
         // pass a arbituary value
         std::variant<int, float> intFloat(10.4f);
