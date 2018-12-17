@@ -8,9 +8,13 @@ public:
     {
         if(i == 0) 
         {
-            throw std::exception();
+            throw 42;
         }
     }
+};
+
+struct S {
+    operator int() { throw 42; }
 };
 
 int main()
@@ -28,12 +32,12 @@ int main()
         std::cout << "catch(...)" << std::endl;
 
         // we keep the old state!
-        std::cout << var.valueless_by_exception() << std::endl;
+        std::cout << var.valueless_by_exception() << std::endl;     // Returns false if and only if the variant holds a value
         std::cout << std::get<int>(var) << std::endl;
     }
 
     // inside `emplace`, this is different
-    var = ThrowingClass(10);
+    var = 42;
     try
     {
         var.emplace<1>(ThrowingClass(0));
@@ -45,5 +49,12 @@ int main()
         // the old state was already destroyed, not valid state
         std::cout << var.valueless_by_exception() << std::endl;
         std::cout << std::get<int>(var) << std::endl;
+    }
+
+    std::variant<float, int> v = 12.f; // OK
+    try {
+        v.emplace<1>(S()); // v may be valueless
+    } catch (...) {
+        std::cout << v.valueless_by_exception() << std::endl;
     }
 }

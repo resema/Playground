@@ -21,10 +21,10 @@ int main()
     // std::get_if
     {
         std::variant<int, float> intFloat;
-       if (const auto intPtr = std::get_if<0>(&intFloat))   // interestingly `get_if` takes a pointer; `get` a reference...
-       {
-           std::cout << "int!" << std::endl;
-       }
+        if (const auto intPtr = std::get_if<0>(&intFloat))   // interestingly `get_if` takes a pointer; `get` a reference...
+        {
+            std::cout << "int!" << std::endl;
+        }
     }
 
     // Visitor
@@ -62,8 +62,5 @@ int main()
 
         intFloat = 10.0f;
         std::visit(MultiplyVisitor(0.5f), intFloat);
-
-        auto PrintVisitor = [](const auto& t){ std::cout << t << std::endl; };
-        std::visit(PrintVisitor, intFloat);
     }
 }
