@@ -399,9 +399,9 @@ VarRoot computeRoots(double a, double b, double c) {
 ### let's match
 ```cpp
 match(computeRoots(1, -2, -2),
-      [](const std::pair<double, double> &arg){ // ... },
-      [](const double &arg){ // ... },
-      [](std::monostate){ // ... }
+      [](const std::pair<double, double> &arg){ /* ... */ },
+      [](const double &arg){ /* ... */ },
+      [](std::monostate){ /* ... */ }
       );
 ```
 
@@ -410,12 +410,88 @@ Note:
 
 
 ### example from mattermost discussion
+```cpp
+struct CTestA {
+    CTestA(int iVal) {}
+};
+struct CTestB {
+    CTestB(float fVal) {}
+};
+```
+```cpp
+using TestCase = std::variant<CTestA,
+                              CTestB>;
+```
 
 
-### polymorphism
+### execute the tests
+```cpp
+void distinguish(const TestCase &rTest) {
+    match(rTest,
+          [](const CTestA &rCaseA) { /* ... */ },
+          [](const CTestB &rCaseB) { /* ... */ });
+}
+```
+```cpp
+std::vector<TestCase> vTests;
+vTests.emplace_back(CTestA(42));
+vTests.emplace_back(CTestA(11));
+vTests.emplace_back(CTestB(42.11f));
+
+for(const auto& rTest : vTests) {
+    distinguish(rTest);
+}
+```
 
 
 ### benefits
+```cpp
+struct X {};
+
+std::variant<std::string, X> var;
+```
+```cpp
+match(var,
+      [](int i){ /* ... */ },
+      [](std::string &str) { /* ... */ });
+```
+
 Note:
 - missing cases become compile-time errors
  - if not possible to be converted by a cast
+
+
+ ### polymorphism
+```cpp
+struct Triangle {
+    void Render() { /* ... */ }
+};
+struct Polygon {
+    void Render() { /* ... */ }
+};
+```
+```cpp
+std::vector<std::variant<Triangle, Polygon>> objects{
+    Polygon(),
+    Triangle()
+};
+```
+```cpp
+auto CallRender = [](auto &obj) { obj.Render(); };
+
+for(const auto &rObj : objects) {
+    std::visit(CallRender, obj);
+}
+```
+
+Note:
+- Generic lambda for interface
+
+
+
+ ## further interesting topics
+ - Ranges <!-- .element: class="fragment" -->
+ - Concepts <!-- .element: class="fragment" -->
+ - Time Travel Debugging <!-- .element: class="fragment" -->
+ - Design by Introspection (DbI) <!-- .element: class="fragment" -->
+ - Coroutines <!-- .element: class="fragment" -->
