@@ -229,4 +229,193 @@ std::visit(MultiplyVisitor(0.5f), intFloat);
 
 
 ### functional paradigm
-- coming from...
+- state machines <!-- .element: class="fragment" -->
+- multiple return values (computation, error codes, ...) <!-- .element: class="fragment" -->
+- parsing <!-- .element: class="fragment" -->
+- event handling <!-- .element: class="fragment" -->
+- polymorphism <!-- .element: class="fragment" -->
+
+
+### how to match?
+
+
+### what we want!
+```cpp
+match(variable,
+    [](WidgetA a){
+        // case A
+    },
+    [](WidgetB b){
+        // case B
+    });
+```
+
+
+### what can we get?
+- multiple overloaded call-operator <!-- .element: class="fragment" -->
+- generic lambda <!-- .element: class="fragment" -->
+
+Note: 
+- But how to get what we want? Matching lambdas.
+
+
+### proposal to std::overload
+- creates a class derived from multiple lambdas <!-- .element: class="fragment" -->
+- can easily be implemented until its defined by the standard <!-- .element: class="fragment" -->
+
+
+### overloading two lambdas
+```cpp
+template<class T1, class T2>
+struct overload2 : T1, T2
+{
+    overload2(const T1& t1, const T2& t2) : T1(t1), T2(t2) {}
+
+    using T1::operator();
+    using T2::operator();
+};
+```
+```cpp
+std::variant<std::string, int> var;
+
+std::visit(
+    overload2(
+        [](int){ std::cout << "int!\n"; },
+        [](const std::string&){ std::cout << "string!\n"; }
+    ), var);
+```
+
+
+### using variadic templates
+```cpp
+template<class ...Ts>
+struct overload : Ts...
+{
+    overload(const Ts&... ts) : Ts(ts)... {}
+
+    using Ts::operator()...;
+};
+```
+```cpp
+std::variant<std::string, int> var;
+std::visit(
+    overload(
+        [](int){ std::cout << "int!\n"; },
+        [](const std::string&){ std::cout << "string!\n"; }
+    ), var);
+```
+
+Note:
+- Type deduction works because the cstor is NOT a template
+- BUT it copies the lambdas into the base object
+
+
+### nitty-gritty details
+```cpp
+template<class ...Ts>
+struct overload : Ts...
+{
+    // cstor templated to allow only-movables
+    template<class ...Us>
+    overload(Us&& ...us) : Ts(std::forward<Us>(us))...
+    {
+    }
+
+    using Ts::operator()...;
+};
+
+// cstor a template -> automatic deduction guides not working
+template<class ...Us>
+overload(Us&&...) -> overload<std::remove_reference_t<Us>...>;
+```
+
+
+### no copies anymore
+```cpp
+auto f1 = std::function<void(int)>([](int){ std::cout << "int!\n"; });
+auto spX = std::make_unique<X>();
+
+std::variant<std::string, int> var;
+var = 42;
+std::visit(
+    overload(
+        f1, // copied
+        [uX = std::move(spX)](const std::string&){ std::cout << "string!\n"; } // move only
+    ), var
+);
+```
+
+
+### let's create a match() method
+```cpp
+template <typename Variant, typename... Matchers>
+auto match(Variant& variant, Matchers&&... matchers)
+{
+  return std::visit(
+    overload{std::forward<Matchers>(matchers)...},
+             variant);
+}
+```
+
+
+### and we finally get
+```cpp
+match(variable,
+    [](WidgetA a){
+        // case A
+    },
+    [](WidgetB b){
+        // case B
+    });
+```
+
+&#10154; what we wanted!
+
+
+
+## use cases
+
+
+### different computational results
+```cpp
+using VarRoot = std::variant<std::pair<double, double>, 
+                             double, 
+                             std::monostate>;
+
+VarRoot computeRoots(double a, double b, double c) {
+    double discriminant = b*b - 4*a*c;
+    if(discriminant > 0.0) {
+        double p = sqrt(discriminant) / (2*a);
+        return std::make_pair(-b + p, -b - p);
+    }
+    else if(discriminant == 0.0) {
+        return (-1*b) / (2*a);
+    }
+    else { return std::monostate(); }
+}
+```
+
+
+### let's match
+```cpp
+match(computeRoots(1, -2, -2),
+      [](const std::pair<double, double> &arg){ // ... },
+      [](const double &arg){ // ... },
+      [](std::monostate){ // ... }
+      );
+```
+
+Note:
+- also possible a std::function or a functor
+
+
+### example from mattermost discussion
+
+
+### polymorphism
+
+
+### benefits
+Note:
+- missing cases become compile-time errors
+ - if not possible to be converted by a cast
