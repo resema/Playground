@@ -1,5 +1,5 @@
 ## C++ Meeting 2018
-
+---
 ### Pattern Matching mit std::variant
 
 
@@ -486,6 +486,20 @@ for(const auto &rObj : objects) {
 
 Note:
 - Generic lambda for interface
+
+
+### variant vs inheritance
+- closed to alternatives
+- open to new operations
+- single level
+- functional
+- simple
+
+- open to alternatives
+- closed to new operations
+- multi-level
+- object oriented
+- can become complex
 
 
 
