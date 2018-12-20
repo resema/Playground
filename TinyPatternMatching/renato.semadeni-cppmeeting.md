@@ -489,17 +489,21 @@ Note:
 
 
 ### variant vs inheritance
-- closed to alternatives
-- open to new operations
-- single level
-- functional
-- simple
+<div class="left">
+<p> closed to alternatives </p>
+<p> open to new operations </p>
+<p> single level </p>
+<p> functional </p>
+<p> simple </p>
+</div>
 
-- open to alternatives
-- closed to new operations
-- multi-level
-- object oriented
-- can become complex
+<div class="right">
+<p> open to alternatives </p>
+<p> closed to new operations </p>
+<p> multi-level </p>
+<p> object oriented </p>
+<p> can become complex </p>
+</div>
 
 
 
