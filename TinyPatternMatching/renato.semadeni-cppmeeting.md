@@ -84,22 +84,22 @@ class NoDefaultCstor
 ```
 ```cpp
 std::variant<std::monostate, NoDefaultCstor, int> okInit;
-std::cout << okInit.index() << std::endl;
-if (auto obj = std::get_if<std::monostate>(&okInit); obj)
-{
-    std::cout << "containg type is std::monostate\n";
-}
+
+assert(std::get_if<std::monostate>(&okInit));
 ```
 
 
 ### how to initialize?
 ``` cpp
 std::variant<int, float> intFloat;
-// Assignment operator
+
+// by assignment operator
 intFloat = 10;                                              
-// emplace<Idx>
+
+// by emplace<Idx>
 intFloat.emplace<1>(10.3f);                                 
-// Visitor
+
+// by a visitor
 if (auto pFloat = std::get_if<float>(&intFloat); pFloat)    
 {
     *pFloat *= 2.0f;
@@ -127,13 +127,13 @@ public:
     ~OtherWidget() { std::cout << "Other destruction"; }
 };
 ```
+
+
+### outcome
 ```cpp
 std::variant<Widget, OtherWidget> var;
 var = OtherWidget();
 ```
-
-
-### outcome
 ``` shell
 $ ./lifetime
 Widget construction             # default init
@@ -251,12 +251,10 @@ std::visit(MultiplyVisitor(0.5f), intFloat);
 ### what we want!
 ```cpp
 match(variable,
-    [](WidgetA a){
-        // case A
-    },
-    [](WidgetB b){
-        // case B
-    });
+      ProcessA,
+      ProcessB,
+      ...
+);
 ```
 
 
@@ -308,6 +306,7 @@ struct overload : Ts...
 ```
 ```cpp
 std::variant<std::string, int> var;
+
 std::visit(
     overload(
         [](int){ std::cout << "int!\n"; },
@@ -342,15 +341,16 @@ overload(Us&&...) -> overload<std::remove_reference_t<Us>...>;
 
 ### no copies anymore
 ```cpp
-auto f1 = std::function<void(int)>([](int){ std::cout << "int!\n"; });
+auto f1 = std::function<void(int)>([](int){ /* ... */ });
 auto spX = std::make_unique<X>();
-
+```
+```cpp
 std::variant<std::string, int> var;
-var = 42;
+
 std::visit(
     overload(
-        f1, // copied
-        [uX = std::move(spX)](const std::string&){ std::cout << "string!\n"; } // move only
+        f1,
+        [uX = std::move(spX)](std::string&){ /* ... */ }
     ), var
 );
 ```
@@ -537,7 +537,7 @@ Note:
 - large trace files <!-- .element: class="fragment" -->
 - allows stepping forward and backward in crashed code <!-- .element: class="fragment" -->
 - can be downloaded from the Windows Store <!-- .element: class="fragment" -->
- - `WinDbg Preview` <!-- .element: class="fragment" -->
+ - <p>`WinDbg Preview`</p> <!-- .element: class="fragment" -->
 
 
 ### design by introspection (DbI)
@@ -547,7 +547,7 @@ Note:
 ### key words from DbI
 - DbI Input <!-- .element: class="fragment" -->
  - Introspection types: "What are your methods?" <!-- .element: class="fragment" -->
- - <p> Variant: "Do you support method `xyz?`" </p><!-- .element: class="fragment" -->
+ - Variant: "Do you support method xyz?" <!-- .element: class="fragment" -->
  - Strongest: "Does this code compile?" <!-- .element: class="fragment" -->
 - DbI Processing <!-- .element: class="fragment" -->
  - Arbitrary compile-time evaluation <!-- .element: class="fragment" -->
