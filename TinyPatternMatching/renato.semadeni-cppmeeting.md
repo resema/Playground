@@ -76,15 +76,14 @@ Note:
 
 ### we have to use std::monostate
 ```cpp
-class NoDefCstor
+class NoDefaultCstor
 {
     public:
-        cstor(int, float) {}
+        NoDefaultCstor(int, float) {}
 };
 ```
-
 ```cpp
-std::variant<std::monostate, NoDefCstor, int> okInit;
+std::variant<std::monostate, NoDefaultCstor, int> okInit;
 std::cout << okInit.index() << std::endl;
 if (auto obj = std::get_if<std::monostate>(&okInit); obj)
 {
