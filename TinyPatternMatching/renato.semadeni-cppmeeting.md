@@ -11,6 +11,7 @@
 - represents a type-safe union <!-- .element: class="fragment" -->
 - holds a value of one of its types OR no value <!-- .element: class="fragment" -->
 - it is not permitted to hold refs, arrays or void <!-- .element: class="fragment" -->
+- C++17 feature<!-- .element: class="fragment" -->
 
 
 ## problems with unions
@@ -20,8 +21,8 @@
 
 ### handling
 - default constructed with the value of its first alternative <!-- .element: class="fragment" -->
- - `std::monostate` for non default-constructible 
-- throws <!-- .element: class="fragment" --> `std::bad_variant_access` <!-- .element: class="fragment" -->
+ - <p>`std::monostate` for non default-constructible</p> <!-- .element: class="fragment" -->
+- <p>throws `std::bad_variant_access`</p> <!-- .element: class="fragment" -->
 
 
 ### memory consumption
@@ -49,19 +50,28 @@ std::cout << intFloat.index() << ", value "
           << std::get<int>(intFloat) << std::endl;
 ```
 
+```shell
+$ ./default
+0, value 0
+```
+
 
 ### non default constructible types
 ```cpp
-class NoDefCstor
+class NoDefaultCstor
 {
     public:
-        cstor(int, float) {}
+        NoDefaultCstor(int, float) {}
 };
 ```
 ```cpp
 // compile-time error
-std::variant<NoDefCstor, int> cannotInit; 
+std::variant<NoDefaultCstor, int> cannotInit; 
 ```
+
+Note:
+- [gcc](https://godbolt.org/z/wTZkCy)
+- [clang](https://godbolt.org/z/zD_rsc)
 
 
 ### we have to use std::monostate
@@ -262,6 +272,7 @@ Note:
 ### proposal to std::overload
 - creates a class derived from multiple lambdas <!-- .element: class="fragment" -->
 - can easily be implemented until its defined by the standard <!-- .element: class="fragment" -->
+- probably C++20? <!-- .element: class="fragment" -->
 
 
 ### overloading two lambdas
@@ -507,9 +518,43 @@ Note:
 
 
 
- ## further interesting topics
- - Ranges <!-- .element: class="fragment" -->
- - Concepts <!-- .element: class="fragment" -->
- - Time Travel Debugging <!-- .element: class="fragment" -->
- - Design by Introspection (DbI) <!-- .element: class="fragment" -->
- - Coroutines <!-- .element: class="fragment" -->
+## further interesting topics
+- Ranges <!-- .element: class="fragment" -->
+- Concepts <!-- .element: class="fragment" -->
+- Time Travel Debugging <!-- .element: class="fragment" -->
+- Design by Introspection (DbI) <!-- .element: class="fragment" -->
+- Coroutines <!-- .element: class="fragment" -->
+
+
+### ranges
+
+
+### concepts
+
+
+### time travel debugging
+- new tool by Microsoft <!-- .element: class="fragment" -->
+- additional to dump files <!-- .element: class="fragment" -->
+- large trace files <!-- .element: class="fragment" -->
+- allows stepping forward and backward in crashed code <!-- .element: class="fragment" -->
+- can be downloaded from the Windows Store <!-- .element: class="fragment" -->
+ - `WinDbg Preview` <!-- .element: class="fragment" -->
+
+
+### design by introspection (DbI)
+<p>*'The next big thing'* <small>Andrei Alexandrescu</small> </p><!-- .element: class="fragment" -->
+
+
+### key words from DbI
+- DbI Input <!-- .element: class="fragment" -->
+ - Introspection types: "What are your methods?" <!-- .element: class="fragment" -->
+ - <p> Variant: "Do you support method `xyz?`" </p><!-- .element: class="fragment" -->
+ - Strongest: "Does this code compile?" <!-- .element: class="fragment" -->
+- DbI Processing <!-- .element: class="fragment" -->
+ - Arbitrary compile-time evaluation <!-- .element: class="fragment" -->
+- DbI Output<!-- .element: class="fragment" -->
+ - Generate arbitrary code <!-- .element: class="fragment" -->
+
+
+### tl;dr
+ Questions?
