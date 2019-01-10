@@ -14,6 +14,15 @@
 - C++17 feature<!-- .element: class="fragment" -->
 
 
+### tiny example
+```cpp
+std::variant<int, float> intFloat;
+intFloat = 42;
+
+assert(std::get<int> == 42);
+```
+
+
 ## problems with unions
 - no way to know its content type <!-- .element: class="fragment" -->
 - no lifetime support <!-- .element: class="fragment" -->
@@ -72,6 +81,11 @@ std::variant<NoDefaultCstor, int> cannotInit;
 Note:
 - [gcc](https://godbolt.org/z/wTZkCy)
 - [clang](https://godbolt.org/z/zD_rsc)
+
+
+### std::monostate
+- unit type intended for use as a well-behaved empty alternative
+- could be aliased to give a better name
 
 
 ### we have to use std::monostate
@@ -155,7 +169,7 @@ struct ThrowingWidget {
 ``` cpp
 std::variant<float, int> var = 12.f; // OK
 try {
-    var.emplace<1>(S()); // var may be valueless
+    var.emplace<1>(ThrowingWidget()); // var may be valueless
 } catch (...) {
     std::cout << var.valueless_by_exception() << std::endl;
 }
