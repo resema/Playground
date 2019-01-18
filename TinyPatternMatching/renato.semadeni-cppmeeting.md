@@ -9,12 +9,19 @@
 
 ### CbVariant
 - represents a type-safe union<!-- .element: class="fragment" -->
-- <p>contains a `tag`</p> <!-- .element: class="fragment" -->
 - provides a small interface<!-- .element: class="fragment" -->
  - <p> `IsNull`, `SetNull` </p> <!-- .element: class="fragment" -->
  - <p> `GetType` </p> <!-- .element: class="fragment" -->
  - <p> `ConvertTo`, `ConvertToLocalized` </p> <!-- .element: class="fragment" -->
  - <p> `Serialize` </p> <!-- .element: class="fragment" -->
+
+
+### implementation of CbVariant
+- <p> contains an `enum` to indicate containing element</p> <!-- .element: class="fragment" -->
+- <p> data is hold by an `union` of all possible types </p> <!-- .element: class="fragment" -->
+- works mainly with type conversion <!-- .element: class="fragment" -->
+- doesn't know which types can be assigned <!-- .element: class="fragment" -->
+- doesn't handle lifetime of its objects <!-- .element: class="fragment" -->
 
 
 ### std::variant
@@ -31,6 +38,7 @@ intFloat = 42;
 
 assert(std::get<int> == 42);
 ```
+
 
 
 ## problems with unions
@@ -190,6 +198,7 @@ Do not use. Example is not self-speaking.
 Keep in mind, that ```valueless_by_exception``` can be used in such cases.
 
 
+
 ## how to access a std::variant?
 ```cpp
 std::variant<int, float> intFloat;
@@ -255,6 +264,28 @@ std::variant<int, float> intFloat;
 
 std::visit(MultiplyVisitor(0.5f), intFloat);
 ```
+
+
+
+## std::visit
+- most probably uses a N-dimensional matrix of function pointers <!-- .element: class="fragment" -->
+- dispatches between those entries <!-- .element: class="fragment" -->
+- two possible approaches described by M. Park (reference implementation)<!-- .element: class="fragment" -->
+ - jump table <!-- .element: class="fragment" -->
+ - recursive switch<!-- .element: class="fragment" -->
+- C++17 feature <!-- .element: class="fragment" -->
+
+
+### do we want a CbVisit
+- does not exist <!-- .element: class="fragment" -->
+- <p> current problems when realized for `CbVariant` </p> <!-- .element: class="fragment" -->
+ - <p> `CbVariant` is not aware of its type possibilities nor indices </p> <!-- .element: class="fragment" -->
+ - <p> could be realized by augmenting `CbVariant` to a template </p> <!-- .element: class="fragment" -->
+
+
+ ### C++14 implementation of std::variant and std::visit
+ - easy to achieve by using the reference implementation by M. Park <!-- .element: class="fragment" -->
+ - <p> doesn't provide the benefits of `CbVariant` such as Serialization </p> <!-- .element: class="fragment" -->
 
 
 
