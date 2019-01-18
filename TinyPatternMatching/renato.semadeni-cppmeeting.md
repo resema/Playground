@@ -4,7 +4,17 @@
 
 
 
-## what is a std::variant
+## what is a variant
+
+
+### CbVariant
+- represents a type-safe union<!-- .element: class="fragment" -->
+- <p>contains a `tag`</p> <!-- .element: class="fragment" -->
+- provides a small interface<!-- .element: class="fragment" -->
+ - <p> `IsNull`, `SetNull` </p> <!-- .element: class="fragment" -->
+ - <p> `GetType` </p> <!-- .element: class="fragment" -->
+ - <p> `ConvertTo`, `ConvertToLocalized` </p> <!-- .element: class="fragment" -->
+ - <p> `Serialize` </p> <!-- .element: class="fragment" -->
 
 
 ### std::variant
