@@ -7,6 +7,22 @@
 ## what is a variant
 
 
+### std::variant
+- represents a type-safe union <!-- .element: class="fragment" -->
+- holds a value of one of its types OR no value <!-- .element: class="fragment" -->
+- it is not permitted to hold refs, arrays or void <!-- .element: class="fragment" -->
+- C++17 feature<!-- .element: class="fragment" -->
+
+
+### tiny example
+```cpp
+std::variant<int, float> intFloat;
+intFloat = 42;
+
+assert(std::get<int> == 42);
+```
+
+
 ### CbVariant
 - represents a type-safe union<!-- .element: class="fragment" -->
 - provides a small interface<!-- .element: class="fragment" -->
@@ -22,22 +38,6 @@
 - works mainly with type conversion <!-- .element: class="fragment" -->
 - doesn't know which types can be assigned <!-- .element: class="fragment" -->
 - doesn't handle lifetime of its objects <!-- .element: class="fragment" -->
-
-
-### std::variant
-- represents a type-safe union <!-- .element: class="fragment" -->
-- holds a value of one of its types OR no value <!-- .element: class="fragment" -->
-- it is not permitted to hold refs, arrays or void <!-- .element: class="fragment" -->
-- C++17 feature<!-- .element: class="fragment" -->
-
-
-### tiny example
-```cpp
-std::variant<int, float> intFloat;
-intFloat = 42;
-
-assert(std::get<int> == 42);
-```
 
 
 
@@ -59,7 +59,7 @@ assert(std::get<int> == 42);
 
 ### sizeof
 ```cpp
-std::cout <<  sizeof(std::string);                      // 24
+std::cout << sizeof(std::string);                      // 24
 
 std::cout << sizeof(std::variant<std::string>);         // 32
 
@@ -132,7 +132,7 @@ intFloat = 10;
 intFloat.emplace<1>(10.3f);                                 
 
 // by a visitor
-if (auto pFloat = std::get_if<float>(&intFloat); pFloat)    
+if (auto pFloat = std::get_if<float>(&intFloat))    
 {
     *pFloat *= 2.0f;
 }
@@ -168,12 +168,12 @@ var = OtherWidget();
 ```
 ``` shell
 $ ./lifetime
-Widget construction             # default init
-OtherWidget construction        # cstor
-Widget destruction              # lifetime ended
-OtherWidget copy-construction   # assignment
-OtherWidget destruction         # used for assignment
-OtherWidget destruction         # end of scope
+Widget construction       # default init
+Other construction        # cstor
+Widget destruction        # lifetime ended
+Other copy-construction   # assignment
+Other destruction         # used for assignment
+Other destruction         # end of scope
 ```
 
 
@@ -206,7 +206,6 @@ std::variant<int, float> intFloat;
 try
 {
     auto f = std::get<float>(intFloat);
-    std::cout << "float!" << std::endl;
 }
 catch (std::bad_variant_access&)
 {
@@ -218,7 +217,7 @@ catch (std::bad_variant_access&)
 ### shorter version using `std::get_if`
 ```cpp
 std::variant<int, float> intFloat;
-if (const auto intPtr = std::get_if<0>(&intFloat))
+if (std::get_if<int>(&intFloat) != nullptr)
 {
     std::cout << "int!" << std::endl;
 }
@@ -270,22 +269,23 @@ std::visit(MultiplyVisitor(0.5f), intFloat);
 ## std::visit
 - most probably uses a N-dimensional matrix of function pointers <!-- .element: class="fragment" -->
 - dispatches between those entries <!-- .element: class="fragment" -->
-- two possible approaches described by M. Park (reference implementation)<!-- .element: class="fragment" -->
+- two possible approaches for dispatching described by M. Park (reference implementation)<!-- .element: class="fragment" -->
  - jump table <!-- .element: class="fragment" -->
  - recursive switch<!-- .element: class="fragment" -->
 - C++17 feature <!-- .element: class="fragment" -->
 
 
 ### do we want a CbVisit
-- does not exist <!-- .element: class="fragment" -->
+- does currently not exist <!-- .element: class="fragment" -->
 - <p> current problems when realized for `CbVariant` </p> <!-- .element: class="fragment" -->
- - <p> `CbVariant` is not aware of its type possibilities nor indices </p> <!-- .element: class="fragment" -->
+ - <p> `CbVariant` is not aware of its type possibilities nor their indices </p> <!-- .element: class="fragment" -->
  - <p> could be realized by augmenting `CbVariant` to a template </p> <!-- .element: class="fragment" -->
 
 
  ### C++14 implementation of std::variant and std::visit
  - easy to achieve by using the reference implementation by M. Park <!-- .element: class="fragment" -->
  - <p> doesn't provide the benefits of `CbVariant` such as Serialization </p> <!-- .element: class="fragment" -->
+ - works quasi out-of-the-box <!-- .element: class="fragment" -->
 
 
 
@@ -411,7 +411,7 @@ std::visit(
 ```
 
 
-### let's create a match() method
+### let's create a match method
 ```cpp
 template <typename Variant, typename... Matchers>
 auto match(Variant& variant, Matchers&&... matchers)
@@ -520,6 +520,7 @@ match(var,
       [](int i){ /* ... */ },
       [](std::string &str) { /* ... */ });
 ```
+- missing cases become compile-time errors <!-- .element: class="fragment" -->
 
 Note:
 - missing cases become compile-time errors
@@ -573,11 +574,42 @@ Note:
 
 
 ## further interesting topics
+- 50 Shades of C++ <!-- .element: class="fragment" -->
 - Ranges <!-- .element: class="fragment" -->
 - Concepts <!-- .element: class="fragment" -->
 - Time Travel Debugging <!-- .element: class="fragment" -->
 - Design by Introspection (DbI) <!-- .element: class="fragment" -->
 - Coroutines <!-- .element: class="fragment" -->
+
+
+### 50 shades of c++
+- keynote by Nicolai Josuttis <!-- .element: class="fragment" -->
+- traps in modern C++ <!-- .element: class="fragment" -->
+
+
+### how to implement a trivial class
+```cpp
+class Customer {
+    private:
+        std::string name;
+    public:
+    Customer(const std::string& n) : name(n) {
+        assert(n.size() > 0);
+    }
+    void setName(const std::string& n) {
+        assert(n.size() > 0);
+        name = n;
+    }
+    const std::string& getName() const {
+        return name;
+    }
+};
+
+std::ostream& operator<<(std::ostream& os, 
+                         const Customer& c) {
+    return os << c.getName();
+} 
+```
 
 
 ### ranges
@@ -599,7 +631,7 @@ Note:
 <p>*'The next big thing'* <small>Andrei Alexandrescu</small> </p><!-- .element: class="fragment" -->
 
 
-### key words from DbI
+#### key words from DbI
 - DbI Input <!-- .element: class="fragment" -->
  - Introspection types: "What are your methods?" <!-- .element: class="fragment" -->
  - Variant: "Do you support method xyz?" <!-- .element: class="fragment" -->
