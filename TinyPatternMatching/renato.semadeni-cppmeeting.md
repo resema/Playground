@@ -5,6 +5,14 @@
 
 
 ## what is a variant
+- sum type
+- holds a value of one of its types
+- ...
+
+
+### problems with unions
+- no way to know its content type <!-- .element: class="fragment" -->
+- no lifetime support <!-- .element: class="fragment" -->
 
 
 ### std::variant
@@ -35,18 +43,13 @@ assert(std::get<int> == 42);
 ### implementation of CbVariant
 - <p> contains an `enum` to indicate containing element</p> <!-- .element: class="fragment" -->
 - <p> data is hold by an `union` of all possible types </p> <!-- .element: class="fragment" -->
-- works mainly with type conversion <!-- .element: class="fragment" -->
+- works mainly with type conversions <!-- .element: class="fragment" -->
 - doesn't know which types can be assigned <!-- .element: class="fragment" -->
 - doesn't handle lifetime of its objects <!-- .element: class="fragment" -->
 
 
 
-## problems with unions
-- no way to know its content type <!-- .element: class="fragment" -->
-- no lifetime support <!-- .element: class="fragment" -->
-
-
-### handling
+## handling
 - default constructed with the value of its first alternative <!-- .element: class="fragment" -->
  - <p>`std::monostate` for non default-constructible</p> <!-- .element: class="fragment" -->
 - <p>throws `std::bad_variant_access`</p> <!-- .element: class="fragment" -->
@@ -67,6 +70,10 @@ std::cout << sizeof(std::variant<int, std::string>);    // 32
 
 std::cout << sizeof(std::variant<int, float>);          // 8
 ```
+
+
+### performance
+- ...
 
 
 ### default constructible types
