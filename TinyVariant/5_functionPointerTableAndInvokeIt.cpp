@@ -125,6 +125,5 @@ struct index_of_best_match
 int main()
 {
   	std::size_t val = index_of_best_match<float, pack<int, float>>::value;
-	printf("%i", val);
 }
 
